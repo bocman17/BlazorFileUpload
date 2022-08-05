@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorFileUpload.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220804025632_UploadResults")]
-    partial class UploadResults
+    [Migration("20220804120247_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,7 +42,7 @@ namespace BlazorFileUpload.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Uploads");
+                    b.ToTable("UploadResults");
                 });
 #pragma warning restore 612, 618
         }

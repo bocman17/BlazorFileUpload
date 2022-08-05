@@ -4,12 +4,12 @@
 
 namespace BlazorFileUpload.Server.Migrations
 {
-    public partial class UploadResults : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Uploads",
+                name: "UploadResults",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -20,14 +20,14 @@ namespace BlazorFileUpload.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Uploads", x => x.Id);
+                    table.PrimaryKey("PK_UploadResults", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Uploads");
+                name: "UploadResults");
         }
     }
 }

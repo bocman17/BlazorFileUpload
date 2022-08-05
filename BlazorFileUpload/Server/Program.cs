@@ -1,3 +1,4 @@
+global using BlazorFileUpload.Server.Services.UploadServices;
 using BlazorFileUpload.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddScoped<IUploadService, UploadService>();
 
 var app = builder.Build();
 

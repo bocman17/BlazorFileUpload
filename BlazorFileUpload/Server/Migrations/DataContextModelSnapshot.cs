@@ -40,7 +40,7 @@ namespace BlazorFileUpload.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Uploads");
+                    b.ToTable("UploadResults");
                 });
 #pragma warning restore 612, 618
         }

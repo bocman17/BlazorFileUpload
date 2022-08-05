@@ -2,18 +2,20 @@
 @using System.Net.Http.Headers;
 @using BlazorFileUpload.Shared
 @inject HttpClient http
+@inject IUploadService UploadService
 @inject IJSRuntime JS
+@implements IDisposable
 
 <PageTitle>Upload Files</PageTitle>
 
 <h1>Upload Files</h1>
 
-<InputFile OnChange="@OnInputFileChange" multiple />
+<InputFile OnChange="UploadService.InputFileChange" multiple />
 
 @if (fileNames.Count > 0)
 {
     <ul>
-        @foreach (var fileName in fileNames)
+        @foreach (var fileName in UploadService.FileNames)
         {
             <li>
                 File: @fileName
@@ -27,19 +29,27 @@
     </ul>
 }
 
-<ul>
-    @foreach (var file in allFilesFromDb)
-    {
-        <li>
-            File: @file.FileName
-            <br>
-            <span>
-                Stored File Name: @GetStoredFileName(file.FileName)
-            </span>
-            <button @onclick="@(() => DownloadFile(GetStoredFileName(file.FileName), file.FileName))">Download</button>
-        </li>
-    }
-</ul>
+@if (UploadService.Files == null || UploadService.Files.Count == 0)
+{
+    <span>@UploadService.Message</span>
+}
+else
+{
+    <div>test</div>
+    <ul>
+        @foreach (var file in UploadService.Files)
+        {
+            <li>
+                File: @file.FileName
+                <br>
+                <span>
+                    Stored File Name: @file.StoredFileName
+                </span>
+                <button class="btn btn-primary" @onclick="@(() => DownloadFile(file.StoredFileName, file.FileName))">Download</button>
+            </li>
+        }
+    </ul>
+}
 
 @code
 {
@@ -47,33 +57,17 @@
     private long maxFileSize = long.MaxValue;
     private List<string> fileNames = new();
     private List<UploadResult> uploadResults = new();
-    private List<UploadResult> allFilesFromDb = new();
 
-    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    protected override async Task OnInitializedAsync()
     {
-        using var content = new MultipartFormDataContent();
+        await UploadService.GetFilesFromDb();
 
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
-        {
-            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+        UploadService.OnChange += StateHasChanged;
+    }
 
-            fileNames.Add(file.Name);
-
-            content.Add(
-                content: fileContent,
-                name: "\"files\"",
-                fileName: file.Name
-                );
-        }
-
-        var response = await http.PostAsync("/api/File", content);
-        var newUploadResults = await response.Content.ReadFromJsonAsync<List<UploadResult>>();
-
-        if (newUploadResults is not null)
-        {
-            uploadResults = uploadResults.Concat(newUploadResults).ToList();
-        }
+    public void Dispose()
+    {
+        UploadService.OnChange -= StateHasChanged;
     }
 
     private string? GetStoredFileName(string fileName)
@@ -104,14 +98,5 @@
         }
     }
 
-    private async Task GetAllFiles()
-    {
-        var result = await http.GetFromJsonAsync<List<UploadResult>>("api/File");
-        allFilesFromDb = result;
-    }
 
-    protected override void OnInitialized()
-    {
-        GetAllFiles();
-    }
 }

@@ -10,6 +10,6 @@ namespace BlazorFileUpload.Server.Data
 
         }
 
-        public DbSet<UploadResult> Uploads => Set<UploadResult>();
+        public DbSet<UploadResult> UploadResults => Set<UploadResult>();
     }
 }
